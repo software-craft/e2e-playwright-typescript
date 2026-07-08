@@ -1,0 +1,23 @@
+{
+  "name": "e2e-login-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/software-craft/e2e-playwright-typescript.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/software-craft/e2e-playwright-typescript/issues"
+  },
+  "homepage": "https://github.com/software-craft/e2e-playwright-typescript#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.0"
+  }
+}
