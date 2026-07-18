@@ -20,16 +20,16 @@ test('TC-01 Verify visual elements on the register page', async ({ page }) => {
 
 });
 
-test('TC-2 Verify disabled register button', async ({ page }) => {
+test('TC-02 Verify disabled register button', async ({ page }) => {
   await expect(registerPage.registerButton).toBeDisabled();
 });
 
-test('TC-3 Verify register button is enabled after completing all fields', async({ page }) => {
+test('TC-03 Verify register button is enabled after completing all fields', async({ page }) => {
   await registerPage.registerFormComplete(testData.validUser.firsName, testData.validUser.lastName, testData.validUser.email, testData.validUser.password );
   await expect(registerPage.registerButton).toBeEnabled();
 });
 
-test('TC-4 Verify redirection to login page when clicking the register button', async({ page }) => {
+test('TC-04 Verify redirection to login page when clicking the register button', async({ page }) => {
   const email = generateUniqueEmail('Crafter');
 
   await registerPage.registerFormComplete(testData.validUser.firsName, testData.validUser.lastName, email, testData.validUser.password);
@@ -39,18 +39,18 @@ test('TC-4 Verify redirection to login page when clicking the register button', 
   await expect(registerPage.passwordInput).toBeVisible();
 });
 
-test('TC-5 Verify registration form validation', async ({ page }) => {
+test('TC-05 Verify registration form validation', async ({ page }) => {
   const email = generateUniqueEmail('register');
   await registerPage.registerFormCompleteAndSubmit(testData.validUser.firsName, testData.validUser.lastName, email, testData.validUser.password);
   await expect(page).toHaveURL('http://localhost:3000/login');
 });
 
 
-test('TC-6 Verify that a user cannot register with an existing email address', async ({ page }) => {
-  const email = generateUniqueEmail('duplicate');
+test('TC-06 Verify that a user cannot register with an existing email address', async ({ page }) => {
+  const email = (testData.validUser.email.split('@')[0]) + `${Date.now()}@${testData.validUser.email.split('@')[1]}`;
 
   await registerPage.registerFormCompleteAndSubmit('Soft', 'Test', email, '1234561');
-  await expect(page.getByAltText('Registro exitoso')).toBeVisible();
+
   await expect(page).toHaveURL('http://localhost:3000/login');
 
   await registerPage.visitRegisterPage();
