@@ -20,6 +20,7 @@ export class RegisterPage {
     async visitRegisterPage() {
         await this.page.goto('http://localhost:3000/');
     }
+
 async registerFormComplete(firsName: string, lastName: string, email: string, password: string) {
     await this.firstNameInput.fill(firsName);
     await this.lastNameInput.fill(lastName);
