@@ -36,4 +36,5 @@ async registerFormComplete(firsName: string, lastName: string, email: string, pa
     await this.registerFormComplete(firsName, lastName, email, password);
     await this.clickRegisterButton();
 }
+
 }
