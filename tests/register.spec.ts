@@ -43,6 +43,7 @@ test('TC-05 Verify registration form validation', async ({ page }) => {
   const email = generateUniqueEmail('register');
   await registerPage.registerFormCompleteAndSubmit(testData.validUser.firsName, testData.validUser.lastName, email, testData.validUser.password);
   await expect(page).toHaveURL('http://localhost:3000/login');
+
 });
 
 
@@ -59,4 +60,28 @@ test('TC-06 Verify that a user cannot register with an existing email address', 
 
   await expect(page.getByText('Email already in use')).toBeVisible();
   await expect(page).not.toHaveURL('http://localhost:3000/login');
+});
+
+test('TC-08 Verify registration form validation with API request', async ({ page }) => {
+
+  await test.step('Fill out the form with valid data', async () => {
+
+    const email = (testData.validUser.email.split('@')[0]) + `${Date.now()}@${testData.validUser.email.split('@')[1]}`;
+
+    await registerPage.registerFormComplete(
+      testData.validUser.firsName,
+      testData.validUser.lastName,
+      email,
+      testData.validUser.password
+    );
+
+    const responsePromise = page.waitForResponse('http://localhost:6007/api/auth/signup');
+    
+    await registerPage.clickRegisterButton();
+    const response = await responsePromise;
+    expect(response.status()).toBe(201);
+
+    await expect(page.getByText('Registro exitoso')).toBeVisible();
+  });
+
 });
