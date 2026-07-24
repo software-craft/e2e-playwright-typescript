@@ -59,8 +59,6 @@ test('TC-06 Verify that a user cannot register with an existing email address', 
 
   await expect(page.getByText('Email already in use')).toBeVisible();
   await expect(page).not.toHaveURL('http://localhost:3000/login');
-<<<<<<< HEAD
-=======
 });
 
 test('TC-08 Verify registration form validation with API request', async ({ page }) => {
@@ -129,5 +127,4 @@ test('TC-09 Generate signup with API request', async ({ request }) => {
     lastName: testData.validUser.lastName,
     email: expect.stringContaining('@')
   }));
->>>>>>> 9780c9d (TC8/TC9-API and sintaxys bug)
 });
