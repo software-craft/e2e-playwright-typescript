@@ -1,6 +1,6 @@
 {
     "validUser": {
-        "firsName": "Software",
+        "firstName": "Software",
         "lastName": "Craft",
         "email": "software@hotmail.com",
         "password": "123456"
