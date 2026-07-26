@@ -1,5 +1,7 @@
 import { test, expect, request } from '@playwright/test';
 import { RegisterPage } from '../pages/registerPage';
+import { LoginPage } from '../pages/loginPage';
+import { DashboardPage } from '../pages/dashboardPage';
 import testData from '../data/testData.json';
 import { generateUniqueEmail } from '../data/testData';
 
@@ -127,4 +129,54 @@ test('TC-09 Generate signup with API request', async ({ request }) => {
     lastName: testData.validUser.lastName,
     email: expect.stringContaining('@')
   }));
+});
+
+test('TC-10 Verify frontend behavior when a 500 error occurs during registration', async ({ page }) => {
+  const email = (testData.validUser.email.split('@')[0]) + Date.now().toString();
+
+  // Interceptar la solicitud de registro y devolver un error 500
+  await page.route('**/api/auth/signup', route => {
+    route.fulfill({
+      status: 500,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: 'Internal Server Error' }),
+    });
+  });
+
+  await registerPage.registerFormCompleteAndSubmit(
+        testData.validUser.firstName, 
+        testData.validUser.lastName, 
+        email, 
+        testData.validUser.password);
+
+
+  await expect(page.getByText('Internal Server Error')).toBeVisible();
+
+});
+
+
+test('TC-11 Login new user created via API', async ({ request, page }) => {
+  const endoint = 'http://localhost:6007/api/auth/signup';
+  const response = await request.post(endoint, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },    
+    data: {
+      firstName: testData.validUser.firstName,
+      lastName: testData.validUser.lastName,
+      email: generateUniqueEmail('api'),
+      password: testData.validUser.password
+    }
+  });
+
+  const responseBody = await response.json();
+  expect(response.status()).toBe(201);
+
+  const loginPage = new LoginPage(page);
+  const dashboardPage = new DashboardPage(page);
+
+
+  await registerPage.registerFormCompleteAndSubmit(testData.validUser.firstName, testData.validUser.lastName, responseBody.user.email, testData.validUser.password);
+  await expect(page.getByText('Email already in use')).toBeVisible();
 });
