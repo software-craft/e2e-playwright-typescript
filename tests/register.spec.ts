@@ -6,10 +6,14 @@ import testData from '../data/testData.json';
 import { generateUniqueEmail } from '../data/testData';
 
 let registerPage: RegisterPage;
+let loginPage: LoginPage;
+let dashboardPage: DashboardPage;
 
 
 test.beforeEach(async ({ page }) => {
   registerPage = new RegisterPage(page);
+  loginPage = new LoginPage(page);
+  dashboardPage = new DashboardPage(page);
   await registerPage.visitRegisterPage();
 });
 
@@ -155,28 +159,48 @@ test('TC-10 Verify frontend behavior when a 500 error occurs during registration
 });
 
 
-test('TC-11 Login new user created via API', async ({ request, page }) => {
-  const endoint = 'http://localhost:6007/api/auth/signup';
-  const response = await request.post(endoint, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },    
+test('TC-11 Login with new user created by backend and verify dashboard', async ({ page, request }) => {
+
+  const userEmail = generateUniqueEmail('api');
+
+  // --- ARRANGE: crear usuario vía API (signup) ---
+  const signupResponse = await request.post('http://localhost:6007/api/auth/signup', {
     data: {
       firstName: testData.validUser.firstName,
       lastName: testData.validUser.lastName,
-      email: generateUniqueEmail('api'),
-      password: testData.validUser.password
-    }
+      email: userEmail,
+      password: testData.validUser.password,
+    },
   });
 
-  const responseBody = await response.json();
-  expect(response.status()).toBe(201);
+  const signupBody = await signupResponse.json();
+  expect(signupResponse.status()).toBe(201);
+  expect(signupBody.user.email).toBe(userEmail);
 
-  const loginPage = new LoginPage(page);
-  const dashboardPage = new DashboardPage(page);
+  await loginPage.visitLoginPage();
 
+  const loginResponsePromise = page.waitForResponse('http://localhost:6007/api/auth/login');
 
-  await registerPage.registerFormCompleteAndSubmit(testData.validUser.firstName, testData.validUser.lastName, responseBody.user.email, testData.validUser.password);
-  await expect(page.getByText('Email already in use')).toBeVisible();
+  await loginPage.registerFormComplete(userEmail, testData.validUser.password);
+  await loginPage.clickLoginButton();
+
+  const loginResponse = await loginResponsePromise;
+  const loginBody = await loginResponse.json();
+
+  expect(loginResponse.status()).toBe(200);
+  expect(loginBody).toHaveProperty('token');
+  expect(typeof loginBody.token).toBe('string');
+  expect(loginBody).toHaveProperty('user');
+  expect(loginBody.user).toEqual(
+    expect.objectContaining({
+      id: expect.any(String),
+      firstName: testData.validUser.firstName,
+      lastName: testData.validUser.lastName,
+      email: userEmail,
+    })
+  );
+
+  await expect(page.getByText('Inicio de sesión exitoso')).toBeVisible();
+  await expect(dashboardPage.dashboardTitle).toBeVisible();
+
 });
