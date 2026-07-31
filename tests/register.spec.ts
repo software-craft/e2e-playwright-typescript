@@ -5,9 +5,11 @@ import { DashboardPage } from '../pages/dashboardPage';
 import testData from '../data/testData.json';
 import { generateUniqueEmail } from '../data/testData';
 
+
 let registerPage: RegisterPage;
 let loginPage: LoginPage;
 let dashboardPage: DashboardPage;
+
 
 
 test.beforeEach(async ({ page }) => {
@@ -16,6 +18,7 @@ test.beforeEach(async ({ page }) => {
   dashboardPage = new DashboardPage(page);
   await registerPage.visitRegisterPage();
 });
+
 
 test('TC-01 Verify visual elements on the register page', async ({ page }) => {
   await expect(registerPage.firstNameInput).toBeVisible();
