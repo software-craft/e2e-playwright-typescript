@@ -176,7 +176,6 @@ test('TC-11 Login with new user created by backend and verify dashboard', async 
 
   const userEmail = generateUniqueEmail('api');
 
-  // --- ARRANGE: crear usuario vía API (signup) ---
   const signupResponse = await request.post('http://localhost:6007/api/auth/signup', {
     data: {
       firstName: testData.validUser.firstName,

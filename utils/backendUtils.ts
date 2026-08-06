@@ -1,5 +1,13 @@
 
+
 import { APIRequestContext, expect } from '@playwright/test';
+
+interface UserPayload {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+}
 
 export class BackendUtils {
 
