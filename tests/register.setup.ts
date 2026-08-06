@@ -4,6 +4,7 @@ import { LoginPage } from '../pages/loginPage';
 import testData from '../data/testData.json';
 
 let loginPage: LoginPage;
+let backendUtils: backendUtils;
 
 const userSendAuthfile = 'playwright/.auth/userSendAuth.json';
 const userReceiveAuthfile = 'playwright/.auth/userReceiveAuth.json';
@@ -13,14 +14,10 @@ setup.beforeEach(async ({ page }) => {
     await loginPage.visitLoginPage();
 });
 
-setup('Generate user that sends money', async ({ page, request }) => {
-    const utils = new backendUtils(page);
-    const newUser = await utils.generateUniqueUser(request, testData.validUser);
+setup('Generar usuario a traves de la API', async ({ page, request }) => {
+    const newUser = await new backendUtils(request).generateUniqueUser(testData.validUser);
 
-    const responsePromiseLogin = page.waitForResponse('http://localhost:6007/api/auth/login');
-    await loginPage.registerFormCompleteAndSubmit(newUser.email, testData.validUser.password);
-    await responsePromiseLogin;
-
+    const responsePromise = page.waitForResponse('http://localhost:6007/api/auth/register');
     
-    await page.context().storageState({ path: userSendAuthfile });
+    await responsePromise;
 });

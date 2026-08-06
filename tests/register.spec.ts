@@ -4,11 +4,13 @@ import { LoginPage } from '../pages/loginPage';
 import { DashboardPage } from '../pages/dashboardPage';
 import testData from '../data/testData.json';
 import { generateUniqueEmail } from '../data/testData';
+import { BackendUtils } from '../utils/backendUtils';
 
 
 let registerPage: RegisterPage;
 let loginPage: LoginPage;
 let dashboardPage: DashboardPage;
+let backendUtils: BackendUtils;
 
 
 
@@ -112,7 +114,15 @@ test('TC-08 Verify registration form validation with API request', async ({ page
 
 test('TC-09 Generate signup with API request', async ({ request }) => {
   const endoint = 'http://localhost:6007/api/auth/signup';
+  
+  const jsonBody = {
+    firstName: testData.validUser.firstName,
+    lastName: testData.validUser.lastName,
+    email: generateUniqueEmail('api'),
+    password: testData.validUser.password
+  };
   const response = await request.post(endoint, {
+
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
