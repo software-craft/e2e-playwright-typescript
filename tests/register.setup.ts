@@ -14,7 +14,7 @@ setup.beforeEach(async ({ page }) => {
     await loginPage.visitLoginPage();
 });
 
-setup('Generar usuario que envia dinero', async ({ page, request }) => {
+setup('Generate sender user', async ({ page, request }) => {
     const newUser = await BackendUtils.registerUser(
         request,
         TestData.validUser.firstName,
