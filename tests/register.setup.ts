@@ -28,8 +28,10 @@ setup('Generate sender user', async ({ page, request }) => {
 
     await loginPage.registerFormCompleteAndSubmit(newUser.email, newUser.password);
     
-    await page.waitForTimeout(2000);
-
     await dashboardPage.addAccount();    
     
+
+    await page.waitForTimeout(1000);
+    
+///
 });
