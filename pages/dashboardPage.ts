@@ -10,7 +10,7 @@ export class DashboardPage {
         this.page = page;
         this.dashboardTitle = page.getByTestId('titulo-dashboard');
         this.addAccountButton = page.getByTestId('tarjeta-agregar-cuenta');
-
+        
     }
     
     async visitloginPage() {
@@ -21,6 +21,9 @@ export class DashboardPage {
     async addAccount() {
         await this.addAccountButton.click();
     }
+
+   
+
 }
 
 

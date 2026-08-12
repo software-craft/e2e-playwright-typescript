@@ -10,6 +10,7 @@ let loginPage: LoginPage;
 let dashboardPage: DashboardPage;
 let createAccountModal: modalCreateAccount;
 
+
 const userSender = 'playwright/test/userSendAuth.json';
 const userReceiver = 'playwright/test/userReceiveAuth.json';
 
@@ -34,6 +35,8 @@ setup('Generate sender user', async ({ page, request }) => {
     await dashboardPage.addAccount();   
 
     await createAccountModal.selectAccountType('Débito');
+
+    await createAccountModal.completeAmountInput('1000');
 
     await page.waitForTimeout(1000);
     
