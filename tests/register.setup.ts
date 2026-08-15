@@ -41,5 +41,18 @@ setup('Generate sender user', async ({ page, request }) => {
 
     await createAccountModal.submitCreateAccount();
 
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(500);
+
+    await expect(page.getByText('Cuenta creada exitosamente')).toBeVisible();
+
+    await page.context().storageState({ path: userSender });
+});
+
+
+setup('Login receiver user', async ({ page, request }) => {
+    
+await loginPage.registerFormCompleteAndSubmit(TestData.validUser.email, TestData.validUser.password);
+await expect(dashboardPage.dashboardTitle).toBeVisible();
+
+await page.context().storageState({ path: userReceiver });
 });
