@@ -1,9 +1,19 @@
 {
   "name": "e2e-login-test",
   "version": "1.0.0",
-  "description": "",
+  "description": "Professional Playwright E2E testing framework with TypeScript - Login and Registration automation tests",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report",
+    "test:trace": "playwright show-trace",
+    "test:specific": "playwright test --grep",
+    "codegen": "playwright codegen http://localhost:6007",
+    "install:browsers": "playwright install"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/software-craft/e2e-playwright-typescript.git"

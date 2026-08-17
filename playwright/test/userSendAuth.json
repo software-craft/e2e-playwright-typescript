@@ -1,0 +1,14 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "jwt",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhODJlZTgyMjYyMThiNmY5NGZiMzJiNiIsImVtYWlsIjoic29mdHdhcmUxNzg2OTY1NjMzNTA4QGhvdG1haWwuY29tIiwiaWF0IjoxNzg2OTY1NjM2LCJleHAiOjE3ODc1NzA0MzZ9.7bRWWAyOyVSp8Vx-TTmISqqGQm1XLgTDX48boLXaL-0"
+        }
+      ]
+    }
+  ]
+}
