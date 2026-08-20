@@ -23,6 +23,7 @@ export class DashboardPage {
   // Element locators - dashboard UI elements
   readonly dashboardTitle: Locator;
   readonly addAccountButton: Locator;
+  readonly sendMoneyButton: Locator;
 
   /**
    * Constructor - Initialize the page object and define all locators
@@ -35,6 +36,7 @@ export class DashboardPage {
     this.page = page;
     this.dashboardTitle = page.getByTestId('titulo-dashboard');
     this.addAccountButton = page.getByTestId('tarjeta-agregar-cuenta');
+    this.sendMoneyButton = page.getByTestId('boton-enviar')
   }
 
   /**
@@ -60,6 +62,12 @@ export class DashboardPage {
   async addAccount() {
     await this.addAccountButton.click();
   }
+
+  async visitPageDashboard() {
+    await this.page.goto('http://localhost:3000/dashboard');
+    await this.page.waitForLoadState('networkidle');
+  }
+
 }
 
 
