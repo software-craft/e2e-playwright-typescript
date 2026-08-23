@@ -9,8 +9,8 @@ let loginPage: LoginPage;
 let dashboardPage: DashboardPage;
 let createAccountModal: modalCreateAccount;
 
-const userSender = 'playwright/test/userSendAuth.json';
-const userReceiver = 'playwright/test/userReceiveAuth.json';
+const userSender = '.playwright/.auth/userSendAuth.json';
+const userReceiver = '.playwright/.auth/userReceiveAuth.json';
 
 setup.beforeEach(async ({ page }) => {
 
@@ -50,9 +50,8 @@ setup('Generate sender user', async ({ page, request }) => {
 
 
 setup('Login receiver user', async ({ page, request }) => {
-    
-await loginPage.registerFormCompleteAndSubmit(TestData.validUser.email, TestData.validUser.password);
-await expect(dashboardPage.dashboardTitle).toBeVisible();
+    await loginPage.registerFormCompleteAndSubmit(TestData.validUser.email, TestData.validUser.password);
+    await expect(dashboardPage.dashboardTitle).toBeVisible();
 
-await page.context().storageState({ path: userReceiver });
+    await page.context().storageState({ path: userReceiver });
 });

@@ -64,8 +64,10 @@ export class DashboardPage {
   }
 
   async visitPageDashboard() {
-    await this.page.goto('http://localhost:3000/dashboard');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.goto('http://localhost:3000/dashboard', {
+      waitUntil: 'domcontentloaded'
+    });
+    await this.dashboardTitle.waitFor({ state: 'visible' });
   }
 
 }

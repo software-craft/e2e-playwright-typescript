@@ -12,7 +12,7 @@ export class SendMoneyModal {
         this.page = page;
         this.recipientEmailInput = page.getByRole('textbox', { name: 'Email del destinatario *' });
         this.sourceAccountDropdown = page.getByRole('combobox', { name: 'Cuenta origen *'})
-        this.amountInput = page.getByRole('spinbutton', { name: 'Monto *'})
+        this.amountInput = page.getByRole('spinbutton', { name: 'Monto a enviar *'})
         this.cancelButton = page.getByTestId('boton-cancelar-enviar')
         this.senderButton = page.getByTestId('boton-enviar')    
     }
