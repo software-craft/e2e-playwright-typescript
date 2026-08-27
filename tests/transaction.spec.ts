@@ -23,8 +23,10 @@ testUserSend('TC-12 Verify successful transaction', async ({ page }) => {
   await page.waitForTimeout(250);
   await expect(dashboardPage.dashboardTitle).toBeVisible();
   await dashboardPage.sendMoneyButton.click();
-  await sendMoneyModal.recipientEmailInput.fill(testData.validUser.email);
-  await sendMoneyModal.sourceAccountDropdown.click();
+  await sendMoneyModal.fillAndClickSendButton(testData.validUser.email, '10');
+  await expect(page.getByText(`Transferencia enviada a ${testData.validUser.email}`)).toBeVisible();
+  await page.waitForTimeout(250);
+
 
 });
 
