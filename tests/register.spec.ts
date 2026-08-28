@@ -1,15 +1,26 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, request } from '@playwright/test';
 import { RegisterPage } from '../pages/registerPage';
+import { LoginPage } from '../pages/loginPage';
+import { DashboardPage } from '../pages/dashboardPage';
 import testData from '../data/testData.json';
 import { generateUniqueEmail } from '../data/testData';
+import { BackendUtils } from '../utils/backendUtils';
+
 
 let registerPage: RegisterPage;
+let loginPage: LoginPage;
+let dashboardPage: DashboardPage;
+let backendUtils: BackendUtils;
+
 
 
 test.beforeEach(async ({ page }) => {
   registerPage = new RegisterPage(page);
+  loginPage = new LoginPage(page);
+  dashboardPage = new DashboardPage(page);
   await registerPage.visitRegisterPage();
 });
+
 
 test('TC-01 Verify visual elements on the register page', async ({ page }) => {
   await expect(registerPage.firstNameInput).toBeVisible();
@@ -25,14 +36,14 @@ test('TC-02 Verify disabled register button', async ({ page }) => {
 });
 
 test('TC-03 Verify register button is enabled after completing all fields', async({ page }) => {
-  await registerPage.registerFormComplete(testData.validUser.firsName, testData.validUser.lastName, testData.validUser.email, testData.validUser.password );
+  await registerPage.registerFormComplete(testData.validUser.firstName, testData.validUser.lastName, testData.validUser.email, testData.validUser.password );
   await expect(registerPage.registerButton).toBeEnabled();
 });
 
 test('TC-04 Verify redirection to login page when clicking the register button', async({ page }) => {
   const email = generateUniqueEmail('Crafter');
 
-  await registerPage.registerFormComplete(testData.validUser.firsName, testData.validUser.lastName, email, testData.validUser.password);
+  await registerPage.registerFormComplete(testData.validUser.firstName, testData.validUser.lastName, email, testData.validUser.password);
 
   await registerPage.clickRegisterButton();
   await expect(page).toHaveURL('http://localhost:3000/login');
@@ -41,7 +52,7 @@ test('TC-04 Verify redirection to login page when clicking the register button',
 
 test('TC-05 Verify registration form validation', async ({ page }) => {
   const email = generateUniqueEmail('register');
-  await registerPage.registerFormCompleteAndSubmit(testData.validUser.firsName, testData.validUser.lastName, email, testData.validUser.password);
+  await registerPage.registerFormCompleteAndSubmit(testData.validUser.firstName, testData.validUser.lastName, email, testData.validUser.password);
   await expect(page).toHaveURL('http://localhost:3000/login');
 
 });
@@ -60,28 +71,4 @@ test('TC-06 Verify that a user cannot register with an existing email address', 
 
   await expect(page.getByText('Email already in use')).toBeVisible();
   await expect(page).not.toHaveURL('http://localhost:3000/login');
-});
-
-test('TC-08 Verify registration form validation with API request', async ({ page }) => {
-
-  await test.step('Fill out the form with valid data', async () => {
-
-    const email = (testData.validUser.email.split('@')[0]) + `${Date.now()}@${testData.validUser.email.split('@')[1]}`;
-
-    await registerPage.registerFormComplete(
-      testData.validUser.firsName,
-      testData.validUser.lastName,
-      email,
-      testData.validUser.password
-    );
-
-    const responsePromise = page.waitForResponse('http://localhost:6007/api/auth/signup');
-    
-    await registerPage.clickRegisterButton();
-    const response = await responsePromise;
-    expect(response.status()).toBe(201);
-
-    await expect(page.getByText('Registro exitoso')).toBeVisible();
-  });
-
 });

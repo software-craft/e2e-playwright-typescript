@@ -7,5 +7,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["tests/**/*", "pages/**/*", "data/**/*"]
+  "include": ["tests/**/*", "pages/**/*", "data/**/*", "utils/**/*"]
 }
