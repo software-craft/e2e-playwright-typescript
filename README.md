@@ -21,7 +21,6 @@ npm test
 ```bash
 npm test
 npm test tests/login.spec.ts
-npm test -- --grep "TC-07"
 npm test -- --ui
 npx playwright show-report
 ```
