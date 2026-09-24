@@ -1,6 +1,8 @@
-# Testing
+# Testing Guide
 
-## Run tests
+## English
+
+### Run the suite
 
 ```bash
 npm test
@@ -8,139 +10,85 @@ npm test tests/login.spec.ts
 npm test -- --grep "TC-07"
 npm test -- --debug
 npm test -- --ui
-```
-
-## Basic structure
-
-```ts
-import { test, expect } from '@playwright/test';
-import { LoginPage } from '../pages/loginPage';
-
-test('TC-07 Verify login with valid credentials', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-
-  await loginPage.visitLoginPage();
-  await loginPage.loginWithCredentials('user@example.com', 'password123');
-
-  await expect(page).toHaveURL(/.*dashboard/);
-});
-```
-
-## Good practices
-
-- Use page objects for UI interactions.
-- Keep test names clear: `TC-## ...`.
-- Assert behavior, not implementation.
-- Prefer stable selectors and explicit waits.
-- Keep tests independent from each other.
-
-## Common assertions
-
-```ts
-await expect(page).toHaveURL(/.*dashboard/);
-await expect(locator).toBeVisible();
-await expect(locator).toBeEnabled();
-await expect(locator).toHaveText('Login');
-```
-
-## Debugging
-
-```bash
-npm test -- --debug
-npm test -- --ui
 npx playwright show-report
 ```
 
-If a test fails, inspect the trace and browser logs before changing the test logic.
-```typescript
-// Application takes long to load
-await page.waitForLoadState('networkidle'); // Wait for all network requests
+The `package.json` scripts also provide `npm run test:debug`,
+`npm run test:ui`, `npm run test:headed`, `npm run test:report`, and
+`npm run codegen`.
 
+### Test structure
+
+Tests describe behavior and assertions; Page Objects contain locators and UI
+actions. A typical test creates a page object, navigates, performs a business
+action, and checks an observable result:
+
+```ts
+const loginPage = new LoginPage(page);
+await loginPage.visitLoginPage();
+await loginPage.registerFormCompleteAndSubmit(email, password);
+await expect(page).toHaveURL(/.*dashboard/);
+```
+
+### Conventions
+
+- Use names such as `TC-07 Verify login with valid credentials`.
+- Use Page Objects for UI interaction.
+- Prefer `getByRole`, `getByTestId`, and other stable locators.
+- Assert visible state, URLs, messages, or other user-observable outcomes.
+- Wait for a condition with `expect` or `waitFor`; avoid arbitrary delays.
+- Keep tests independent, while respecting the shared receiver caveat described
+  in [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+### Debugging and evidence
+
+Start with the HTML report and browser logs:
+
+```bash
+npm run test:debug
+npm run test:ui
+npm run test:report
+```
+
+The configuration collects a trace on the first retry. Use an explicit
+`networkidle` wait only when the behavior genuinely depends on network
+completion:
+
+```ts
+await page.waitForLoadState('networkidle');
 // or
 await page.goto(url, { waitUntil: 'networkidle' });
 ```
 
-### Test Fails: "Element not found"
-```typescript
-// Check selector is correct
-// Use inspector to verify selector:
-await page.goto('about:blank'); // Then use inspector
-```
+If a locator fails, inspect it with Playwright Inspector and replace brittle
+selectors with stable roles or test IDs. Do not add fixed waits to hide timing
+problems.
 
-### Test Fails: "Flaky" (Sometimes passes, sometimes fails)
+### CI expectations
 
-Common causes:
-- ❌ Not waiting for element to be ready
-- ❌ Race conditions (multiple async operations)
-- ❌ Timeout too short
-- ❌ Network issues
+When `CI` is set, Playwright enables two retries, uses one worker, and fails if
+`test.only` remains in the source. CI must install dependencies and browsers,
+start the application at the configured URL, and then run `npm test`.
 
-**Solution:**
-```typescript
-// Wait explicitly for element
-await expect(element).toBeVisible();
-await element.click();
+## Español
 
-// Or wait for specific condition
-await page.waitForLoadState('networkidle');
-await page.waitForFunction(() => {
-  return document.querySelectorAll('.item').length > 0;
-});
-```
+### Ejecución y depuración
 
----
+Use `npm test` para toda la suite, el nombre de un archivo para una prueba
+concreta y `--grep "TC-##"` para filtrar por nombre. `--debug` abre el
+inspector; `--ui` permite ejecutar desde la interfaz; `npx playwright show-report`
+muestra el informe HTML.
 
-## CI/CD Integration
+### Estilo de pruebas
 
-### GitHub Actions Example
-```yaml
-name: Tests
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - run: npm install
-      - run: npm test
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-```
+Los tests deben expresar el comportamiento y los Page Objects deben contener
+los localizadores y acciones. Use nombres `TC-## Verify ...`, aserciones
+observables y localizadores estables. Espere condiciones reales en vez de
+tiempos fijos.
 
----
+### Evidencia y CI
 
-## Test Reports
+El trace se recopila en el primer reintento. En CI se activan dos reintentos,
+un worker y la prohibición de `test.only`. La aplicación y los navegadores
+deben estar instalados antes de ejecutar la suite.
 
-### View HTML Report
-```bash
-npm test
-npx playwright show-report
-```
-
-**Report shows:**
-- Test results summary
-- Passed/failed tests
-- Screenshots of failures
-- Video recordings (if enabled)
-- Test duration
-
----
-
-## Next Steps
-
-- ✅ Read [README.md](./README.md) for project overview
-- ✅ Read [SETUP.md](./SETUP.md) for environment setup
-- ✅ Read [ARCHITECTURE.md](./ARCHITECTURE.md) for design patterns
-- ✅ Explore page objects in `pages/` folder
-- ✅ Run existing tests to see examples
-- ✅ Create your first test
-
----
-
-**Questions?** Check the [Playwright Documentation](https://playwright.dev)

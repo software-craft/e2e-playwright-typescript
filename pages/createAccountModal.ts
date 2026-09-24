@@ -1,6 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
-export class modalCreateAccount {
+export class CreateAccountModal {
     readonly page: Page;
     readonly typeAccountDropdown: Locator;
     readonly amountInput: Locator;

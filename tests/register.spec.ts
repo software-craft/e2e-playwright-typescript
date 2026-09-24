@@ -12,8 +12,6 @@ let loginPage: LoginPage;
 let dashboardPage: DashboardPage;
 let backendUtils: BackendUtils;
 
-
-
 test.beforeEach(async ({ page }) => {
   registerPage = new RegisterPage(page);
   loginPage = new LoginPage(page);
@@ -41,6 +39,7 @@ test('TC-03 Verify register button is enabled after completing all fields', asyn
 });
 
 test('TC-04 Verify redirection to login page when clicking the register button', async({ page }) => {
+  // Datos únicos aíslan la prueba / Unique data isolates this test from parallel runs.
   const email = generateUniqueEmail('Crafter');
 
   await registerPage.registerFormComplete(testData.validUser.firstName, testData.validUser.lastName, email, testData.validUser.password);
@@ -75,6 +74,7 @@ test('TC-06 Verify that a user cannot register with an existing email address', 
 
 test('TC-08 Verify registration form validation with API request', async ({ page }) => {
 
+  // Valida UI y contrato API / Validates the UI flow and API contract together.
   await test.step('Fill out the form with valid data', async () => {
 
     const email = (testData.validUser.email.split('@')[0]) + `${Date.now()}@${testData.validUser.email.split('@')[1]}`;
@@ -142,9 +142,9 @@ test('TC-09 Generate signup with API request', async ({ request }) => {
 });
 
 test('TC-10 Verify frontend behavior when a 500 error occurs during registration', async ({ page }) => {
+  // Interceptar rutas valida el error de backend / Route interception validates backend failure handling.
   const email = (testData.validUser.email.split('@')[0]) + Date.now().toString();
 
-  // Interceptar la solicitud de registro y devolver un error 500
   await page.route('**/api/auth/signup', route => {
     route.fulfill({
       status: 500,

@@ -19,4 +19,3 @@ test('TC-07 Verify login successful with valid credentials', async ({ page }) =>
   await expect(page).toHaveURL('http://localhost:3000/dashboard');
 
 });
-

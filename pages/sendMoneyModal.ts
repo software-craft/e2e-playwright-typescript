@@ -1,5 +1,4 @@
 import { Page, Locator } from '@playwright/test';
-import testData from '../data/testData.json';
 
 export class SendMoneyModal {
     readonly page: Page;
@@ -21,7 +20,6 @@ export class SendMoneyModal {
     }
 
     async fillAndClickSendButton(recipientEmailInput: string, amountInput: string ) {
-
         await this.recipientEmailInput.fill(recipientEmailInput)
         await this.sourceAccountDropdown.click();
         await this.originAccountOption.click();

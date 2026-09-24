@@ -1,0 +1,6 @@
+name: CI - clone app and test excecution on:
+  on:
+    push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
