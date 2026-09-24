@@ -34,12 +34,19 @@ npm test
 ## Useful commands
 
 ```bash
+<<<<<<< HEAD
 npm test                              # Run the complete suite
 npm test tests/login.spec.ts          # Run one test file
 npm test -- --grep "TC-07"            # Run matching tests
 npm test -- --debug                   # Open the Playwright debugger
 npm test -- --ui                      # Open Playwright UI mode
 npx playwright show-report            # View the latest HTML report
+=======
+npm test
+npm test tests/login.spec.ts
+npm test -- --ui
+npx playwright show-report
+>>>>>>> 071a64417fbdd2c2d95cb0ee7f77a7b3ab5c96ff
 ```
 
 ## Repository map
