@@ -1,13 +1,10 @@
 name: CI - clone app and test execution on
 
-permissions:
-  contents: read
-
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   test:
@@ -31,24 +28,23 @@ jobs:
 
       - name: clone repo athenea
         run: |
-          git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git
+          git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git app
 
       - name: create .env file backend
         run: |
-          cd redux-athena-bank/app/backend
-          printf '%s\n' "MONGO_URI=${MONGO_URI}" > .env
-          printf '%s\n' "JWT_SECRET=${JWT_SECRET}" >> .env
-          printf '%s\n' "PORT=${PORT}" >> .env
-          printf '%s\n' "VITE_API_URL=${VITE_API_URL}" >> .env
+          echo "MONGO_URI=${{ env.MONGO_URI }}" >> app/backend/.env
+          echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> app/backend/.env
+          echo "PORT=${{ env.PORT }}" >> app/backend/.env
+          echo "VITE_API_URL=${{ env.VITE_API_URL }}" >> app/backend/.env
 
       - name: install dependencies backend
         run: |
-          cd redux-athena-bank/app/backend
+          cd app/backend
           npm install
 
       - name: Construct backend
         run: |
-          cd redux-athena-bank/app/backend
+          cd app/backend
           npm run dev > backend.log 2>&1 &
 
       - name: install wait-on
@@ -60,10 +56,13 @@ jobs:
 
       - name: install dependencies frontend
         run: |
-          cd redux-athena-bank/app/frontend
+          cd app/frontend
           npm install
         env:
           VITE_API_URL: ${{ env.VITE_API_URL }}
 
       - name: Construct frontend
-        run: wait-on http://localhost:3000
+        run: |
+          cd app/frontend
+          npm run dev -- --host 0.0.0.0 > frontend.log 2>&1 &
+          wait-on http://localhost:3000
