@@ -2,7 +2,7 @@ name: CI - clone app and test execution on
 
 on:
   push:
-    branches: [ master]
+    branches: [master]
   pull_request:
     branches: [master]
 
@@ -28,12 +28,12 @@ jobs:
 
       - name: clone repo athenea
         run: |
-          git clone git@github.com:Atenea-Conocimientos/redux-athena-bank.git
+          git clone git@github.com:Atenea-Conocimientos/redux-athena-bank.git app
 
       - name: create .env file backend
         run: |
-          echo "MONGO_URI=${{ env.MONGO_URI }}" >> backend/.env
-          echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> backend/.env
+          echo "MONGO_URI=${{ env.MONGO_URI }}" >> app/backend/.env
+          echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> app/backend/.env
           echo "PORT=${{ env.PORT }}" >> backend/.env
           echo "VITE_API_URL=${{ env.VITE_API_URL }}" >> backend/.env
 
