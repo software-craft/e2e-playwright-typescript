@@ -28,14 +28,14 @@ jobs:
 
       - name: clone repo athenea
         run: |
-          git clone git@github.com:Atenea-Conocimientos/redux-athena-bank.git app
+          git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git app
 
       - name: create .env file backend
         run: |
           echo "MONGO_URI=${{ env.MONGO_URI }}" >> app/backend/.env
           echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> app/backend/.env
-          echo "PORT=${{ env.PORT }}" >> backend/.env
-          echo "VITE_API_URL=${{ env.VITE_API_URL }}" >> backend/.env
+          echo "PORT=${{ env.PORT }}" >> app/backend/.env
+          echo "VITE_API_URL=${{ env.VITE_API_URL }}" >> app/backend/.env
 
       - name: install dependencies backend
         run: |
