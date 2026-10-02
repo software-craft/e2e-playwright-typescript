@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [master]
+    branches: ["CICD"]
   pull_request:
-    branches: [master]
+    branches: ["CICD"]
 
 jobs:
   test:
