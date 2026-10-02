@@ -62,4 +62,7 @@ jobs:
           VITE_API_URL: ${{ env.VITE_API_URL }}
 
       - name: Construct frontend
-        run: wait-on http://localhost:3000
+        run: |
+          cd app/frontend
+          npm run dev -- --host 0.0.0.0 > frontend.log 2>&1 &
+          wait-on http://localhost:3000
