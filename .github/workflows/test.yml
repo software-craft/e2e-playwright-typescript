@@ -2,7 +2,7 @@ name: CI - clone app and test execution on
 
 on:
   push:
-    branches: [master]
+    branches: [ master]
   pull_request:
     branches: [master]
 
