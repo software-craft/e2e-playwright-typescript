@@ -1,4 +1,4 @@
-name: CI - clone app and test execution on
+name: Playwright end-to-end tests
 
 permissions:
   contents: read
@@ -20,50 +20,90 @@ jobs:
           - 27017:27017
 
     env:
-      MONGO_URI: ${{ secrets.MONGO_URI }}
+      MONGO_URI: mongodb://127.0.0.1:27017/athena_bank
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       PORT: 6007
       VITE_API_URL: http://localhost:6007/api
 
     steps:
-      - name: checkout actuality repo
-        uses: actions/checkout@v3
+      - name: Check out E2E tests
+        uses: actions/checkout@v4
 
-      - name: clone repo athenea
-        run: |
-          git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: create .env file backend
+      - name: Validate required secrets
         run: |
-          cd redux-athena-bank/app/backend
+          if [ -z "${JWT_SECRET}" ]; then
+            echo "::error::Configure the JWT_SECRET repository secret before running this workflow."
+            exit 1
+          fi
+
+      - name: Clone application repository
+        run: git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git
+
+      - name: Install E2E dependencies and browsers
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      - name: Create backend environment file
+        working-directory: redux-athena-bank/backend
+        run: |
           printf '%s\n' "MONGO_URI=${MONGO_URI}" > .env
           printf '%s\n' "JWT_SECRET=${JWT_SECRET}" >> .env
           printf '%s\n' "PORT=${PORT}" >> .env
-          printf '%s\n' "VITE_API_URL=${VITE_API_URL}" >> .env
 
-      - name: install dependencies backend
+      - name: Install backend dependencies
+        working-directory: redux-athena-bank/backend
+        run: npm install --no-audit --no-fund
+
+      - name: Start backend
+        working-directory: redux-athena-bank/backend
+        run: npm run dev > backend.log 2>&1 &
+
+      - name: Wait for backend
         run: |
-          cd redux-athena-bank/app/backend
-          npm install
+          npx --yes wait-on --timeout 60000 tcp:6007 || {
+            cat redux-athena-bank/backend/backend.log
+            exit 1
+          }
 
-      - name: Construct backend
+      - name: Seed the fixed test recipient
         run: |
-          cd redux-athena-bank/app/backend
-          npm run dev > backend.log 2>&1 &
+          payload="$(node -e "process.stdout.write(JSON.stringify(require('./data/testData.json').validUser))")"
+          curl --fail-with-body --retry 10 --retry-connrefused --retry-delay 2 \
+            -X POST http://localhost:6007/api/auth/signup \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d "$payload"
 
-      - name: install wait-on
-        run: |
-          npm install -g wait-on
+      - name: Install frontend dependencies
+        working-directory: redux-athena-bank/frontend
+        run: npm install --no-audit --no-fund
 
-      - name: Backend
-        run: wait-on tcp:6007
-
-      - name: install dependencies frontend
-        run: |
-          cd redux-athena-bank/app/frontend
-          npm install
+      - name: Start frontend
+        working-directory: redux-athena-bank/frontend
+        run: npm run dev -- --host 0.0.0.0 > frontend.log 2>&1 &
         env:
           VITE_API_URL: ${{ env.VITE_API_URL }}
 
-      - name: Construct frontend
-        run: wait-on http://localhost:3000
+      - name: Wait for frontend
+        run: |
+          npx --yes wait-on --timeout 60000 http://localhost:3000 || {
+            cat redux-athena-bank/frontend/frontend.log
+            exit 1
+          }
+
+      - name: Run Playwright tests
+        run: npm test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
