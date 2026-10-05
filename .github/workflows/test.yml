@@ -21,7 +21,6 @@ jobs:
 
     env:
       MONGO_URI: mongodb://127.0.0.1:27017/athena_bank
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
       PORT: 6007
       VITE_API_URL: http://localhost:6007/api
 
@@ -34,12 +33,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Validate required secrets
-        run: |
-          if [ -z "${JWT_SECRET}" ]; then
-            echo "::error::Configure the JWT_SECRET repository secret before running this workflow."
-            exit 1
-          fi
+      - name: Generate ephemeral JWT secret
+        run: echo "JWT_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
 
       - name: Clone application repository
         run: git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git
