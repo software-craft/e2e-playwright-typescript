@@ -7,17 +7,19 @@ import testData from '../data/testData.json';
 
 test.describe.configure({ mode: 'serial' });
 
-// La sesión persistida enfoca la prueba en transferencias / Persisted auth focuses tests on transfers.
+// La sesión persistida evita repetir el inicio de sesión en el flujo del emisor.
 const testUserSend = test.extend({
   storageState: userSendAuth
 });
 
+// Abre el panel del emisor antes de cada escenario asociado a su sesión.
 testUserSend.beforeEach(async ({ page }) => {
   const dashboardPage = new DashboardPage(page);
   await dashboardPage.visitDashboard();
 })
 
 
+// Comprueba que el emisor envía dinero al correo configurado del receptor.
 testUserSend('TC-12 Verify successful transaction', async ({ page }) => {
   const dashboardPage = new DashboardPage(page);
   const sendMoneyModal = new SendMoneyModal(page);
@@ -27,6 +29,7 @@ testUserSend('TC-12 Verify successful transaction', async ({ page }) => {
   await expect(dashboardPage.transferSuccessMessage(testData.validUser.email)).toBeVisible();
 });
 
+// Espera a que el receptor vea el importe recibido, contemplando la actualización asíncrona.
 test.extend({ storageState: userReceive })(
   'TC-13 Verify recipient receives the transfer',
   async ({ page }) => {

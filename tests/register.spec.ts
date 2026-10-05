@@ -12,6 +12,7 @@ let loginPage: LoginPage;
 let dashboardPage: DashboardPage;
 let backendUtils: BackendUtils;
 
+// Prepara los objetos de página y abre el formulario antes de cada escenario.
 test.beforeEach(async ({ page }) => {
   registerPage = new RegisterPage(page);
   loginPage = new LoginPage(page);
@@ -20,6 +21,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 
+// Verifica que los campos y el botón de registro se muestran al usuario.
 test('TC-01 Verify visual elements on the register page', async ({ page }) => {
   await expect(registerPage.firstNameInput).toBeVisible();
   await expect(registerPage.lastNameInput).toBeVisible();
@@ -29,17 +31,20 @@ test('TC-01 Verify visual elements on the register page', async ({ page }) => {
 
 });
 
+// Confirma que no se puede enviar un formulario vacío.
 test('TC-02 Verify disabled register button', async ({ page }) => {
   await expect(registerPage.registerButton).toBeDisabled();
 });
 
+// Confirma que completar los campos habilita el envío del registro.
 test('TC-03 Verify register button is enabled after completing all fields', async({ page }) => {
   await registerPage.registerFormComplete(testData.validUser.firstName, testData.validUser.lastName, testData.validUser.email, testData.validUser.password );
   await expect(registerPage.registerButton).toBeEnabled();
 });
 
+// Verifica que el registro válido redirige a la pantalla de inicio de sesión.
 test('TC-04 Verify redirection to login page when clicking the register button', async({ page }) => {
-  // Datos únicos aíslan la prueba / Unique data isolates this test from parallel runs.
+  // Los datos únicos evitan colisiones con otros casos ejecutados en paralelo.
   const email = generateUniqueEmail('Crafter');
 
   await registerPage.registerFormComplete(testData.validUser.firstName, testData.validUser.lastName, email, testData.validUser.password);
@@ -49,6 +54,7 @@ test('TC-04 Verify redirection to login page when clicking the register button',
   await expect(registerPage.passwordInput).toBeVisible();
 });
 
+// Comprueba el envío del formulario válido y su navegación posterior.
 test('TC-05 Verify registration form validation', async ({ page }) => {
   const email = generateUniqueEmail('register');
   await registerPage.registerFormCompleteAndSubmit(testData.validUser.firstName, testData.validUser.lastName, email, testData.validUser.password);
@@ -57,6 +63,7 @@ test('TC-05 Verify registration form validation', async ({ page }) => {
 });
 
 
+// Confirma que la aplicación rechaza un correo que ya pertenece a un usuario.
 test('TC-06 Verify that a user cannot register with an existing email address', async ({ page }) => {
   const email = (testData.validUser.email.split('@')[0]) + `${Date.now()}@${testData.validUser.email.split('@')[1]}`;
 
@@ -72,9 +79,10 @@ test('TC-06 Verify that a user cannot register with an existing email address', 
   await expect(page).not.toHaveURL('http://localhost:3000/login');
 });
 
+// Comprueba conjuntamente el flujo de registro de la interfaz y el contrato del API.
 test('TC-08 Verify registration form validation with API request', async ({ page }) => {
 
-  // Valida UI y contrato API / Validates the UI flow and API contract together.
+  // Agrupa las aserciones del flujo de registro y de la respuesta HTTP.
   await test.step('Fill out the form with valid data', async () => {
 
     const email = (testData.validUser.email.split('@')[0]) + `${Date.now()}@${testData.validUser.email.split('@')[1]}`;
@@ -113,6 +121,7 @@ test('TC-08 Verify registration form validation with API request', async ({ page
 
 });
 
+// Valida la creación de un usuario enviando la solicitud directamente al API.
 test('TC-09 Generate signup with API request', async ({ request }) => {
   const endoint = 'http://localhost:6007/api/auth/signup';
   const response = await request.post(endoint, {
@@ -141,8 +150,9 @@ test('TC-09 Generate signup with API request', async ({ request }) => {
   }));
 });
 
+// Simula un error del servidor para comprobar cómo lo presenta el frontend.
 test('TC-10 Verify frontend behavior when a 500 error occurs during registration', async ({ page }) => {
-  // Interceptar rutas valida el error de backend / Route interception validates backend failure handling.
+  // La interceptación prueba el error sin depender de una caída real del servicio.
   const email = (testData.validUser.email.split('@')[0]) + Date.now().toString();
 
   await page.route('**/api/auth/signup', route => {
@@ -165,6 +175,7 @@ test('TC-10 Verify frontend behavior when a 500 error occurs during registration
 });
 
 
+// Comprueba el comportamiento del formulario ante un correo que ya fue registrado.
 test('TC-11 Login new user created via API', async ({ request, page }) => {
   const endoint = 'http://localhost:6007/api/auth/signup';
   const response = await request.post(endoint, {

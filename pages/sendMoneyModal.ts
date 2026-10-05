@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
+// Modela el cuadro de diálogo usado para enviar dinero a otro usuario.
 export class SendMoneyModal {
     readonly page: Page;
     readonly recipientEmailInput: Locator;
@@ -9,6 +10,7 @@ export class SendMoneyModal {
     readonly cancelButton: Locator;
     readonly originAccountOption: Locator;
 
+    // Prepara los localizadores del destinatario, la cuenta, el importe y las acciones.
     constructor(page: Page) {
         this.page = page;
         this.recipientEmailInput = page.getByRole('textbox', { name: 'Email del destinatario *' });
@@ -19,6 +21,7 @@ export class SendMoneyModal {
         this.originAccountOption = page.getByRole('option').first();
     }
 
+    // Completa los datos de la transferencia, elige la primera cuenta y la envía.
     async fillAndClickSendButton(recipientEmailInput: string, amountInput: string ) {
         await this.recipientEmailInput.fill(recipientEmailInput)
         await this.sourceAccountDropdown.click();

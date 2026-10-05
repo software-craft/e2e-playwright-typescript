@@ -12,6 +12,7 @@ let createAccountModal: CreateAccountModal;
 const userSender = '.playwright/.auth/userSendAuth.json';
 const userReceiver = '.playwright/.auth/userReceiveAuth.json';
 
+// Inicializa los Page Objects y navega al formulario antes de cada preparación.
 setup.beforeEach(async ({ page }) => {
 
     loginPage = new LoginPage(page);
@@ -21,8 +22,9 @@ setup.beforeEach(async ({ page }) => {
     await loginPage.visitLoginPage();
 });
 
+// Crea un emisor aislado, configura su cuenta y persiste su sesión autenticada.
 setup('Generate sender user', async ({ page, request }) => {
-    // El API es más rápido y aísla la cuenta / API setup is faster and isolates the account.
+    // La API crea rápidamente un usuario único antes de cubrir sus acciones en la interfaz.
     const newUser = await BackendUtils.registerUser(
         request,
         TestData.validUser.firstName,
@@ -45,10 +47,11 @@ setup('Generate sender user', async ({ page, request }) => {
 
     await expect(page.getByText('Cuenta creada exitosamente')).toBeVisible();
 
-    // Guarda la sesión para no repetir login / Persists auth state to avoid repeated login.
+    // Persiste la sesión para reutilizarla en las pruebas de transferencias.
     await page.context().storageState({ path: userSender });
 });
 
+// Inicia sesión con el receptor fijo y persiste su estado para verificar la recepción.
 setup('Login receiver user', async ({ page, request }) => {
     await loginPage.registerFormCompleteAndSubmit(TestData.validUser.email, TestData.validUser.password);
     await expect(dashboardPage.dashboardTitle).toBeVisible();
