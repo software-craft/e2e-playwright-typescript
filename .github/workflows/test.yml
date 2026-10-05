@@ -37,7 +37,7 @@ jobs:
         run: echo "JWT_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
 
       - name: Clone application repository
-        run: git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git
+        run: git clone https://github.com/Atenea-Conocimientos/redux-athena-bank.git app
 
       - name: Install E2E dependencies and browsers
         run: |
@@ -45,24 +45,25 @@ jobs:
           npx playwright install --with-deps
 
       - name: Create backend environment file
-        working-directory: redux-athena-bank/backend
+        working-directory: app/backend
         run: |
           printf '%s\n' "MONGO_URI=${MONGO_URI}" > .env
           printf '%s\n' "JWT_SECRET=${JWT_SECRET}" >> .env
           printf '%s\n' "PORT=${PORT}" >> .env
+          printf '%s\n' "VITE_API_URL=${VITE_API_URL}" >> .env
 
       - name: Install backend dependencies
-        working-directory: redux-athena-bank/backend
+        working-directory: app/backend
         run: npm install --no-audit --no-fund
 
       - name: Start backend
-        working-directory: redux-athena-bank/backend
+        working-directory: app/backend
         run: npm run dev > backend.log 2>&1 &
 
       - name: Wait for backend
         run: |
           npx --yes wait-on --timeout 60000 tcp:6007 || {
-            cat redux-athena-bank/backend/backend.log
+            cat app/backend/backend.log
             exit 1
           }
 
@@ -76,11 +77,11 @@ jobs:
             -d "$payload"
 
       - name: Install frontend dependencies
-        working-directory: redux-athena-bank/frontend
+        working-directory: app/frontend
         run: npm install --no-audit --no-fund
 
       - name: Start frontend
-        working-directory: redux-athena-bank/frontend
+        working-directory: app/frontend
         run: npm run dev -- --host 0.0.0.0 > frontend.log 2>&1 &
         env:
           VITE_API_URL: ${{ env.VITE_API_URL }}
@@ -88,7 +89,7 @@ jobs:
       - name: Wait for frontend
         run: |
           npx --yes wait-on --timeout 60000 http://localhost:3000 || {
-            cat redux-athena-bank/frontend/frontend.log
+            cat app/frontend/frontend.log
             exit 1
           }
 
